@@ -1,0 +1,86 @@
+{
+  "name": "cloupe",
+  "version": "0.1.0",
+  "description": "TypeScript library for reading .cloupe files (10x Genomics Loupe Browser)",
+  "type": "module",
+  "main": "./dist/cloupe.umd.cjs",
+  "module": "./dist/cloupe.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/cloupe.js",
+      "require": "./dist/cloupe.umd.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "!**/*.map"
+  ],
+  "scripts": {
+    "dev": "vitepress dev docs",
+    "build": "tsc && vite build",
+    "build:lib": "tsc && vite build",
+    "build:site": "vitepress build docs",
+    "preview": "vitepress preview docs",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:node": "vitest run --project=node",
+    "test:browser": "vitest run --project=browser",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src tests scripts",
+    "lint:fix": "eslint src tests scripts --fix",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\" \"scripts/**/*.ts\"",
+    "prepare": "husky",
+    "preinstall": "npx only-allow pnpm"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "scripts/*.ts": [
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  },
+  "keywords": [
+    "cloupe",
+    "10x-genomics",
+    "loupe-browser",
+    "single-cell",
+    "bioinformatics"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/honeymaro/cloupe.js"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@vitest/browser": "^3.2.4",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^16.5.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "playwright": "^1.57.0",
+    "prettier": "^3.7.4",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.50.0",
+    "vite": "^7.2.4",
+    "vite-plugin-dts": "^4.5.0",
+    "vitepress": "^1.6.4",
+    "vitest": "^3.2.3"
+  },
+  "dependencies": {
+    "fflate": "^0.8.2"
+  }
+}
