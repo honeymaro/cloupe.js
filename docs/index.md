@@ -11,7 +11,7 @@ hero:
       link: /guide/getting-started
     - theme: alt
       text: Live Demo
-      link: /
+      link: /demo/
     - theme: alt
       text: GitHub
       link: https://github.com/honeymaro/cloupe.js
