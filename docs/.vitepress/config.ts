@@ -8,7 +8,7 @@ export default defineConfig({
 
   lang: "en-US",
   base: "/",
-  outDir: "../dist",
+  outDir: ".vitepress/dist",
 
   head: [["link", { rel: "icon", type: "image/svg+xml", href: "/logo.svg" }]],
 
@@ -122,7 +122,7 @@ export default defineConfig({
   vite: {
     resolve: {
       alias: {
-        cloupe: resolve(__dirname, "../../src"),
+        "cloupe.js": resolve(__dirname, "../../src"),
       },
     },
     server: {
