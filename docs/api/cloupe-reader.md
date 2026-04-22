@@ -298,10 +298,22 @@ Returns expression value for a specific gene-cell combination.
 async getExpressionMatrix(): Promise<SparseMatrix>
 ```
 
-Reads the full expression matrix.
+Reads the full expression matrix in CSR (Compressed Sparse Row) format, optimized for gene-wise access.
 
 ::: warning Caution
 May cause memory issues for large files. Use `getExpressionSlice()` instead.
+:::
+
+### getExpressionMatrixCSC()
+
+```typescript
+async getExpressionMatrixCSC(): Promise<SparseMatrixCSC>
+```
+
+Reads the full expression matrix in the native CSC (Compressed Sparse Column) format of the `.cloupe` file, without CSC→CSR conversion. Use this when you need CSC directly (e.g. handing off to `scipy.sparse.csc_matrix`, WASM kernels, or cell-wise batch processing).
+
+::: warning Caution
+May cause memory issues for large files. Returned typed arrays share storage with internal caches; treat them as read-only.
 :::
 
 ### getExpressionSlice()

@@ -131,6 +131,7 @@ class CloupeReader {
   getCellExpression(barcodeIndex: number): Promise<SparseColumn>;
   getExpressionValue(featureIndex: number, barcodeIndex: number): Promise<number>;
   getExpressionMatrix(): Promise<SparseMatrix>;
+  getExpressionMatrixCSC(): Promise<SparseMatrixCSC>;
   getExpressionSlice(options: SliceOptions): Promise<SparseMatrix>;
 
   // High-level analysis
@@ -171,6 +172,13 @@ interface CellTrack {
 }
 
 interface SparseMatrix {
+  data: Float64Array;
+  indices: Uint32Array;
+  indptr: Uint32Array;
+  shape: [number, number];
+}
+
+interface SparseMatrixCSC {
   data: Float64Array;
   indices: Uint32Array;
   indptr: Uint32Array;

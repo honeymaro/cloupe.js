@@ -92,7 +92,7 @@ console.log(`Expression: ${value}`);
 async readFullMatrix(): Promise<SparseMatrix>
 ```
 
-Reads the full matrix.
+Reads the full matrix in CSR (Compressed Sparse Row) format. Since `.cloupe` files store data in CSC, this method performs a CSC→CSR conversion for efficient gene-wise access.
 
 ::: warning Caution
 May cause memory issues for large files. Use `readSlice()` instead.
@@ -105,6 +105,29 @@ interface SparseMatrix {
   data: Float64Array; // Non-zero values
   indices: Uint32Array; // Column indices (CSR)
   indptr: Uint32Array; // Row pointers
+  shape: [number, number]; // [genes, cells]
+}
+```
+
+### readFullMatrixCSC()
+
+```typescript
+async readFullMatrixCSC(): Promise<SparseMatrixCSC>
+```
+
+Reads the full matrix in the native CSC (Compressed Sparse Column) format without conversion. Prefer this over `readFullMatrix()` when the downstream consumer expects CSC, or when you iterate many cells and want to avoid the one-time conversion cost.
+
+::: warning Caution
+Returned typed arrays share storage with internal caches; treat them as read-only. Throws `CloupeError(NOT_FOUND)` if the file has no CSC data.
+:::
+
+**Returns**
+
+```typescript
+interface SparseMatrixCSC {
+  data: Float64Array; // Non-zero values
+  indices: Uint32Array; // Row (gene) indices
+  indptr: Uint32Array; // Column (cell) pointers, length = numCells + 1
   shape: [number, number]; // [genes, cells]
 }
 ```
@@ -204,10 +227,10 @@ Clears cached data.
 - Fast column access (expression profile for a specific cell)
 - Slow row access (expression distribution for a specific gene)
 
-cloupe.js internally converts to **CSR (Compressed Sparse Row)** to optimize row access:
+cloupe.js exposes both formats:
 
-- Row (gene) based compression
-- Fast row access (expression distribution for a specific gene)
+- `readFullMatrix()` / `getExpressionMatrix()` → CSR, converted on the fly for gene-wise access
+- `readFullMatrixCSC()` / `getExpressionMatrixCSC()` → native CSC, no conversion, for cell-wise access or interop with CSC-expecting consumers
 
 ## Performance Tips
 

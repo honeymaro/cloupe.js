@@ -15,6 +15,7 @@ import {
   CloupeError,
   CloupeErrorCode,
   type SparseMatrix,
+  type SparseMatrixCSC,
   type SparseRow,
   type SparseColumn,
   type SliceOptions,
@@ -34,6 +35,7 @@ export class MatrixReader {
   // Cached data (lazy loaded)
   private cachedColptr: Uint32Array | null = null;
   private cachedMatrix: SparseMatrix | null = null;
+  private cachedMatrixCSC: SparseMatrixCSC | null = null;
   private cachedUmiCounts: Float64Array | null = null;
 
   // Cached CSC components (for efficient row queries without full CSR conversion)
@@ -204,6 +206,37 @@ export class MatrixReader {
     }
 
     return this.cachedMatrix;
+  }
+
+  /**
+   * Reads the full CSC matrix without conversion (native .cloupe format)
+   * More efficient than readFullMatrix() when you need CSC format directly
+   *
+   * @remarks Returned typed arrays share storage with internal caches; treat as read-only.
+   */
+  async readFullMatrixCSC(): Promise<SparseMatrixCSC> {
+    if (this.cachedMatrixCSC) {
+      return this.cachedMatrixCSC;
+    }
+
+    if (!this.hasCSCData) {
+      throw new CloupeError("CSC format not available in this file", CloupeErrorCode.NOT_FOUND);
+    }
+
+    const [pointers, data, indices] = await Promise.all([
+      this.loadPointers(),
+      this.loadCSCValues(),
+      this.loadCSCIndices(),
+    ]);
+
+    this.cachedMatrixCSC = {
+      data,
+      indices,
+      indptr: pointers,
+      shape: this.shape,
+    };
+
+    return this.cachedMatrixCSC;
   }
 
   /**
@@ -840,6 +873,7 @@ export class MatrixReader {
   clearCache(): void {
     this.cachedColptr = null;
     this.cachedMatrix = null;
+    this.cachedMatrixCSC = null;
     this.cachedUmiCounts = null;
     this.cachedCSCValues = null;
     this.cachedCSCIndices = null;

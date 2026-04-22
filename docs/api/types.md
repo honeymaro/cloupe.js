@@ -176,13 +176,13 @@ interface SpatialImageTilesInfo {
 
 ### SparseMatrix
 
-Sparse matrix in CSR/CSC format.
+Sparse matrix in CSR (Compressed Sparse Row) format. Returned by `getExpressionMatrix()` / `readFullMatrix()`.
 
 ```typescript
 interface SparseMatrix {
   data: Float64Array; // Non-zero values
-  indices: Uint32Array; // Column (CSR) or row (CSC) indices
-  indptr: Uint32Array; // Row (CSR) or column (CSC) pointers
+  indices: Uint32Array; // Column indices
+  indptr: Uint32Array; // Row pointers, length = numRows + 1
   shape: [number, number]; // [rows, columns]
 }
 ```
@@ -200,6 +200,21 @@ indices: [0, 2, 2, 0, 1, 3]  (column indices)
 indptr:  [0, 2, 3, 6]        (start position of each row)
 shape:   [3, 4]
 ```
+
+### SparseMatrixCSC
+
+Sparse matrix in native CSC (Compressed Sparse Column) format — the storage layout of `.cloupe` files. Returned by `getExpressionMatrixCSC()` / `readFullMatrixCSC()`.
+
+```typescript
+interface SparseMatrixCSC {
+  data: Float64Array; // Non-zero values
+  indices: Uint32Array; // Row indices
+  indptr: Uint32Array; // Column pointers, length = numCols + 1
+  shape: [number, number]; // [rows, columns]
+}
+```
+
+Structurally identical to `SparseMatrix`, but the semantics of `indices` / `indptr` are swapped. Returned arrays share storage with internal caches — treat as read-only.
 
 ### SparseRow
 

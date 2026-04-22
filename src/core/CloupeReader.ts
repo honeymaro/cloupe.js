@@ -21,6 +21,7 @@ import {
   type Projection,
   type CellTrack,
   type SparseMatrix,
+  type SparseMatrixCSC,
   type SparseRow,
   type SparseColumn,
   type PaginationOptions,
@@ -397,9 +398,21 @@ export class CloupeReader {
 
   /**
    * Gets the full expression matrix (use with caution for large files)
+   * Returns CSR (row-compressed) format, optimized for gene-wise access
    */
   async getExpressionMatrix(): Promise<SparseMatrix> {
     return this.matrix.readFullMatrix();
+  }
+
+  /**
+   * Gets the full expression matrix in native CSC format (use with caution for large files)
+   * Returns CSC (column-compressed) format, optimized for cell-wise access
+   * More efficient than getExpressionMatrix() when you need CSC format directly
+   *
+   * @remarks Returned typed arrays share storage with internal caches; treat as read-only.
+   */
+  async getExpressionMatrixCSC(): Promise<SparseMatrixCSC> {
+    return this.matrix.readFullMatrixCSC();
   }
 
   /**

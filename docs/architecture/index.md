@@ -187,7 +187,8 @@ File/Blob/URL
 │  ├─ FeatureReader  → Feature[]        │
 │  ├─ ProjectionReader → Projection     │
 │  ├─ CellTrackReader → CellTrack       │
-│  └─ MatrixReader   → SparseMatrix     │
+│  └─ MatrixReader   → SparseMatrix /   │
+│                      SparseMatrixCSC  │
 └───────────────────────────────────────┘
     │
     ▼

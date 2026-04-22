@@ -462,8 +462,25 @@ export class Clustering {
 
 /**
  * CSR (Compressed Sparse Row) matrix format
+ * - indptr: row pointers (length = numRows + 1)
+ * - indices: column indices for each non-zero value
+ * - data: non-zero values
  */
 export interface SparseMatrix {
+  data: Float64Array;
+  indices: Uint32Array;
+  indptr: Uint32Array;
+  shape: [number, number];
+}
+
+/**
+ * CSC (Compressed Sparse Column) matrix format
+ * This is the native storage format of .cloupe files
+ * - indptr: column pointers (length = numCols + 1)
+ * - indices: row indices for each non-zero value
+ * - data: non-zero values
+ */
+export interface SparseMatrixCSC {
   data: Float64Array;
   indices: Uint32Array;
   indptr: Uint32Array;

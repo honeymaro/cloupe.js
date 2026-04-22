@@ -38,6 +38,7 @@ export {
   type CellTrack,
   Clustering,
   type SparseMatrix,
+  type SparseMatrixCSC,
   type SparseRow,
   type SparseColumn,
 

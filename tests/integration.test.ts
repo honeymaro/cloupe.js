@@ -442,6 +442,91 @@ describe("CloupeReader Integration", () => {
       expect(lastRow.featureIndex).toBe(reader.featureCount - 1);
     });
 
+    it("should read full matrix in CSC format (native)", async () => {
+      const cscMatrix = await reader.getExpressionMatrixCSC();
+
+      expect(cscMatrix.shape[0]).toBe(reader.featureCount);
+      expect(cscMatrix.shape[1]).toBe(reader.barcodeCount);
+      expect(cscMatrix.data).toBeInstanceOf(Float64Array);
+      expect(cscMatrix.indices).toBeInstanceOf(Uint32Array);
+      expect(cscMatrix.indptr).toBeInstanceOf(Uint32Array);
+
+      // CSC format: indptr length = numCols + 1
+      expect(cscMatrix.indptr.length).toBe(reader.barcodeCount + 1);
+
+      // indices should be row indices (gene indices), all < numFeatures
+      for (let i = 0; i < Math.min(cscMatrix.indices.length, 1000); i++) {
+        expect(cscMatrix.indices[i]).toBeLessThan(reader.featureCount);
+      }
+
+      console.log("CSC matrix loaded:", {
+        shape: cscMatrix.shape,
+        nnz: cscMatrix.data.length,
+        indptrLength: cscMatrix.indptr.length,
+      });
+    }, 60000);
+
+    it("should have consistent data between CSR and CSC formats", async () => {
+      const csrMatrix = await reader.getExpressionMatrix();
+      const cscMatrix = await reader.getExpressionMatrixCSC();
+
+      // Same shape
+      expect(csrMatrix.shape).toEqual(cscMatrix.shape);
+
+      // Same number of non-zeros
+      expect(csrMatrix.data.length).toBe(cscMatrix.data.length);
+
+      // Sum of all values should be equal
+      let csrSum = 0;
+      let cscSum = 0;
+      for (let i = 0; i < csrMatrix.data.length; i++) {
+        csrSum += csrMatrix.data[i];
+        cscSum += cscMatrix.data[i];
+      }
+      expect(Math.abs(csrSum - cscSum)).toBeLessThan(0.001);
+
+      console.log("CSR vs CSC comparison:", {
+        csrNnz: csrMatrix.data.length,
+        cscNnz: cscMatrix.data.length,
+        csrSum: csrSum.toFixed(2),
+        cscSum: cscSum.toFixed(2),
+      });
+    }, 60000);
+
+    it("should read CSC format faster than CSR (no conversion)", async () => {
+      // Clear cache first
+      reader.matrix.clearCache();
+
+      const startCSC = performance.now();
+      await reader.getExpressionMatrixCSC();
+      const elapsedCSC = performance.now() - startCSC;
+
+      // Clear cache again
+      reader.matrix.clearCache();
+
+      const startCSR = performance.now();
+      await reader.getExpressionMatrix();
+      const elapsedCSR = performance.now() - startCSR;
+
+      console.log("Matrix load performance:", {
+        cscTime: `${elapsedCSC.toFixed(0)}ms`,
+        csrTime: `${elapsedCSR.toFixed(0)}ms`,
+        csrOverhead: `${((elapsedCSR / elapsedCSC - 1) * 100).toFixed(1)}%`,
+      });
+
+      // CSC should be faster or similar (CSR requires conversion)
+      // Allow some variance due to system load
+      expect(elapsedCSC).toBeLessThan(elapsedCSR * 1.5);
+    }, 120000);
+
+    it("should cache CSC matrix on repeated reads", async () => {
+      const csc1 = await reader.getExpressionMatrixCSC();
+      const csc2 = await reader.getExpressionMatrixCSC();
+
+      // Should be the exact same object (cached)
+      expect(csc1).toBe(csc2);
+    }, 120000);
+
     it("should have consistent values on repeated reads (caching)", async () => {
       const row1 = await reader.getFeatureExpression(500);
       const row2 = await reader.getFeatureExpression(500);
