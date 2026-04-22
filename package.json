@@ -1,7 +1,12 @@
 {
   "name": "cloupe",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "TypeScript library for reading .cloupe files (10x Genomics Loupe Browser)",
+  "author": {
+    "name": "Hanseulmaro Kim",
+    "email": "honeymaro@live.co.kr",
+    "url": "https://maro.page"
+  },
   "type": "module",
   "main": "./dist/cloupe.umd.cjs",
   "module": "./dist/cloupe.js",
@@ -57,6 +62,10 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/honeymaro/cloupe.js"
+  },
+  "homepage": "https://github.com/honeymaro/cloupe.js#readme",
+  "bugs": {
+    "url": "https://github.com/honeymaro/cloupe.js/issues"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
