@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onUnmounted, watch, nextTick } from 'vue';
-import { CloupeReader } from 'cloupe';
-import type { Projection } from 'cloupe';
+import { CloupeReader } from 'cloupe.js';
+import type { Projection } from 'cloupe.js';
 
 const SAMPLE_URL = '/samples/AMLTutorial.cloupe';
 

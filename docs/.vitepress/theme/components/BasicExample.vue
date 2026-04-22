@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onUnmounted } from 'vue';
-import { CloupeReader } from 'cloupe';
+import { CloupeReader } from 'cloupe.js';
 
 const SAMPLE_URL = '/samples/AMLTutorial.cloupe';
 

@@ -17,7 +17,7 @@ Upload a .cloupe file to see the library in action:
 <div id="result"></div>
 
 <script type="module">
-  import { CloupeReader } from "cloupe";
+  import { CloupeReader } from "cloupe.js";
 
   document.getElementById("fileInput").addEventListener("change", async (e) => {
     const file = e.target.files[0];
@@ -42,7 +42,7 @@ Upload a .cloupe file to see the library in action:
 <div id="dropzone" style="border: 2px dashed #ccc; padding: 40px;">Drop .cloupe file here</div>
 
 <script type="module">
-  import { CloupeReader } from "cloupe";
+  import { CloupeReader } from "cloupe.js";
 
   const dropzone = document.getElementById("dropzone");
 
@@ -76,7 +76,7 @@ Upload a .cloupe file to see the library in action:
 Server must support HTTP Range Requests.
 
 ```typescript
-import { CloupeReader } from "cloupe";
+import { CloupeReader } from "cloupe.js";
 
 const url = "https://your-server.com/data.cloupe";
 const reader = await CloupeReader.open(url);

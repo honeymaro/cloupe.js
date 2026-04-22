@@ -5,19 +5,19 @@
 ### npm
 
 ```bash
-npm install cloupe
+npm install cloupe.js
 ```
 
 ### pnpm
 
 ```bash
-pnpm add cloupe
+pnpm add cloupe.js
 ```
 
 ### yarn
 
 ```bash
-yarn add cloupe
+yarn add cloupe.js
 ```
 
 ## CDN
@@ -56,7 +56,7 @@ cloupe.js requires the following browser features:
 TypeScript 4.5 or higher is recommended. Type definitions are included in the package.
 
 ```typescript
-import { CloupeReader, Feature, Projection } from "cloupe";
+import { CloupeReader, Feature, Projection } from "cloupe.js";
 ```
 
 ## Bundler Configuration

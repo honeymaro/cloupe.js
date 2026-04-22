@@ -9,7 +9,7 @@ This guide covers the basics of reading .cloupe files with cloupe.js.
 Use `CloupeReader.open()` to open a .cloupe file. It accepts File, Blob, or URL string as input.
 
 ```typescript
-import { CloupeReader } from "cloupe";
+import { CloupeReader } from "cloupe.js";
 
 // Get file from file input
 const fileInput = document.querySelector('input[type="file"]');
@@ -207,7 +207,7 @@ console.log(`Non-zero values: ${slice.data.length}`);
 ## Error Handling
 
 ```typescript
-import { CloupeReader, CloupeError, CloupeErrorCode } from "cloupe";
+import { CloupeReader, CloupeError, CloupeErrorCode } from "cloupe.js";
 
 try {
   const reader = await CloupeReader.open(file);

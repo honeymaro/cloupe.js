@@ -14,7 +14,7 @@ Upload a .cloupe file to visualize projections:
 <canvas id="canvas" width="800" height="600"></canvas>
 
 <script type="module">
-  import { CloupeReader } from "cloupe";
+  import { CloupeReader } from "cloupe.js";
 
   async function visualize(file) {
     const reader = await CloupeReader.open(file);
@@ -80,7 +80,7 @@ Upload a .cloupe file to visualize projections:
 ## Cluster-colored Visualization
 
 ```typescript
-import { CloupeReader, CellTrack } from "cloupe";
+import { CloupeReader, CellTrack } from "cloupe.js";
 
 async function visualizeWithClusters(file: File, canvas: HTMLCanvasElement, trackName: string) {
   const reader = await CloupeReader.open(file);

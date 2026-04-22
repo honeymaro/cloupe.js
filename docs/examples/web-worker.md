@@ -18,7 +18,7 @@ Web Workers run in a separate thread, preventing these issues.
 
 ```typescript
 // main.ts
-import { CloupeWorkerClient } from "cloupe";
+import { CloupeWorkerClient } from "cloupe.js";
 
 const worker = new Worker(new URL("cloupe/worker", import.meta.url), { type: "module" });
 
@@ -43,8 +43,8 @@ module.exports = {
 
 ```typescript
 // main.ts
-import CloupeWorker from "cloupe/worker";
-import { CloupeWorkerClient } from "cloupe";
+import CloupeWorker from "cloupe.js/worker";
+import { CloupeWorkerClient } from "cloupe.js";
 
 const worker = new CloupeWorker();
 const client = new CloupeWorkerClient(worker);
@@ -55,7 +55,7 @@ const client = new CloupeWorkerClient(worker);
 CloupeWorkerClient provides the same API as CloupeReader:
 
 ```typescript
-import { CloupeWorkerClient } from "cloupe";
+import { CloupeWorkerClient } from "cloupe.js";
 
 // Create Worker
 const worker = new Worker(new URL("cloupe/worker", import.meta.url), { type: "module" });
@@ -78,7 +78,7 @@ client.terminate(); // Terminate worker
 ## Example: Progress Display
 
 ```typescript
-import { CloupeWorkerClient } from "cloupe";
+import { CloupeWorkerClient } from "cloupe.js";
 
 async function loadWithProgress(file: File, onProgress: (msg: string) => void) {
   const worker = new Worker(new URL("cloupe/worker", import.meta.url), { type: "module" });
@@ -115,7 +115,7 @@ const result = await loadWithProgress(file, (msg) => {
 ## Example: Large Data Processing
 
 ```typescript
-import { CloupeWorkerClient } from "cloupe";
+import { CloupeWorkerClient } from "cloupe.js";
 
 async function analyzeExpression(
   file: File,
@@ -159,7 +159,7 @@ const results = await analyzeExpression(file, genes, (progress) => {
 
 ```tsx
 import { useState, useEffect, useCallback } from "react";
-import { CloupeWorkerClient } from "cloupe";
+import { CloupeWorkerClient } from "cloupe.js";
 
 interface UseCloupeWorkerResult {
   client: CloupeWorkerClient | null;

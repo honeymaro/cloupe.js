@@ -313,7 +313,7 @@ The `Dims` array in ProjectionInfo follows the format `[numDimensions, numPoints
 ## 9. Usage Example
 
 ```typescript
-import { CloupeReader } from "cloupe";
+import { CloupeReader } from "cloupe.js";
 
 // Open file
 const reader = await CloupeReader.open(file);

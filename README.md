@@ -13,17 +13,17 @@ A TypeScript library for reading .cloupe files (10x Genomics Loupe Browser forma
 ## Installation
 
 ```bash
-npm install cloupe
+npm install cloupe.js
 # or
-pnpm add cloupe
+pnpm add cloupe.js
 # or
-yarn add cloupe
+yarn add cloupe.js
 ```
 
 ## Quick Start
 
 ```typescript
-import { CloupeReader } from "cloupe";
+import { CloupeReader } from "cloupe.js";
 
 // Open a .cloupe file (from file input or drag-and-drop)
 const reader = await CloupeReader.open(file);
@@ -156,7 +156,7 @@ const summary = await reader.getSummary();
 For large files, use the Web Worker client to avoid blocking the main thread:
 
 ```typescript
-import { CloupeWorkerClient } from "cloupe";
+import { CloupeWorkerClient } from "cloupe.js";
 
 // Create worker (you need to set up the worker URL with your bundler)
 const worker = new Worker(new URL("cloupe/worker", import.meta.url));

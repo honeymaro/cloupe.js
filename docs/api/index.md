@@ -9,7 +9,7 @@ Documentation for all public APIs in cloupe.js.
 The main class for reading .cloupe files.
 
 ```typescript
-import { CloupeReader } from "cloupe";
+import { CloupeReader } from "cloupe.js";
 
 const reader = await CloupeReader.open(file);
 ```
@@ -158,7 +158,7 @@ enum CloupeErrorCode {
 ## Web Worker
 
 ```typescript
-import { CloupeWorkerClient } from "cloupe";
+import { CloupeWorkerClient } from "cloupe.js";
 
 const worker = new Worker(new URL("cloupe/worker", import.meta.url), { type: "module" });
 const client = new CloupeWorkerClient(worker);

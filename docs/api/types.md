@@ -418,7 +418,7 @@ enum CloupeErrorCode {
 **Error Handling Examples**
 
 ```typescript
-import { CloupeError, CloupeErrorCode } from "cloupe";
+import { CloupeError, CloupeErrorCode } from "cloupe.js";
 
 try {
   const reader = await CloupeReader.open(file);

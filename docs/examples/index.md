@@ -19,7 +19,7 @@ Search and analyze gene expression data from your .cloupe file:
 ### Opening a File
 
 ```typescript
-import { CloupeReader } from "cloupe";
+import { CloupeReader } from "cloupe.js";
 
 // From file input
 const reader = await CloupeReader.open(file);
@@ -119,7 +119,7 @@ while (hasMore) {
 
 ```tsx
 import { useState, useEffect } from "react";
-import { CloupeReader } from "cloupe";
+import { CloupeReader } from "cloupe.js";
 
 function CloupeViewer({ file }: { file: File }) {
   const [reader, setReader] = useState<CloupeReader | null>(null);
@@ -168,7 +168,7 @@ function CloupeViewer({ file }: { file: File }) {
 ### Error Handling
 
 ```typescript
-import { CloupeReader, CloupeError, CloupeErrorCode } from "cloupe";
+import { CloupeReader, CloupeError, CloupeErrorCode } from "cloupe.js";
 
 async function loadFile(file: File) {
   try {

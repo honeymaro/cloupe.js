@@ -1,6 +1,6 @@
 {
-  "name": "cloupe",
-  "version": "0.2.0",
+  "name": "cloupe.js",
+  "version": "0.2.1",
   "description": "TypeScript library for reading .cloupe files (10x Genomics Loupe Browser)",
   "author": {
     "name": "Hanseulmaro Kim",

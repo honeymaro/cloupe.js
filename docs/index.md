@@ -40,11 +40,11 @@ features:
 ## Quick Start
 
 ```bash
-npm install cloupe
+npm install cloupe.js
 ```
 
 ```typescript
-import { CloupeReader } from "cloupe";
+import { CloupeReader } from "cloupe.js";
 
 // Open a .cloupe file
 const reader = await CloupeReader.open(file);

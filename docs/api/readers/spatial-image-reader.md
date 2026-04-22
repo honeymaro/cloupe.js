@@ -267,7 +267,7 @@ interface ZoomLevelInfo {
 
 ```typescript
 import L from "leaflet";
-import { CloupeReader } from "cloupe";
+import { CloupeReader } from "cloupe.js";
 
 async function createViewer(container: HTMLElement, file: File) {
   const reader = await CloupeReader.open(file);
