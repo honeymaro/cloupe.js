@@ -4,7 +4,7 @@ Learn how to read .cloupe files in the browser using cloupe.js.
 
 ## Introduction
 
-cloupe.js is a TypeScript library for reading 10x Genomics Loupe Browser file format (.cloupe) in browser environments. It uses the File API for random access without loading the entire file into memory.
+cloupe.js is a JavaScript library for reading 10x Genomics Loupe Browser file format (.cloupe) in browser environments. It uses the File API for random access without loading the entire file into memory.
 
 ## Key Features
 

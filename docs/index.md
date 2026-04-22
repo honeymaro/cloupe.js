@@ -4,7 +4,7 @@ layout: home
 hero:
   name: cloupe.js
   text: .cloupe File Reader
-  tagline: TypeScript library for reading 10x Genomics Loupe files in the browser
+  tagline: JavaScript library for reading 10x Genomics Loupe files in the browser
   actions:
     - theme: brand
       text: Get Started

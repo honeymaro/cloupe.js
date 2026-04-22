@@ -1,6 +1,6 @@
 # cloupe.js
 
-A TypeScript library for reading .cloupe files (10x Genomics Loupe Browser format) in the browser.
+A JavaScript library for reading .cloupe files (10x Genomics Loupe Browser format) in the browser.
 
 ## Features
 

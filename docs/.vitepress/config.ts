@@ -4,7 +4,7 @@ import { existsSync, statSync, createReadStream } from "fs";
 
 export default defineConfig({
   title: "cloupe.js",
-  description: "TypeScript library for reading .cloupe files in the browser",
+  description: "JavaScript library for reading .cloupe files in the browser",
 
   lang: "en-US",
   base: "/",
@@ -24,7 +24,7 @@ export default defineConfig({
         text: "Links",
         items: [
           { text: "GitHub", link: "https://github.com/honeymaro/cloupe.js" },
-          { text: "npm", link: "https://www.npmjs.com/package/cloupe" },
+          { text: "npm", link: "https://www.npmjs.com/package/cloupe.js" },
         ],
       },
     ],
