@@ -2,7 +2,7 @@
 import { ref, onUnmounted } from 'vue';
 import { CloupeReader } from 'cloupe.js';
 
-const SAMPLE_URL = '/samples/AMLTutorial.cloupe';
+const SAMPLE_URL = 'https://pub-80efc7b31f944811985c0bdc785ee183.r2.dev/AMLTutorial.cloupe';
 
 interface SearchResult {
   index: number;

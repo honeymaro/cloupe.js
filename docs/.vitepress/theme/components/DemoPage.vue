@@ -205,8 +205,10 @@ async function loadFromUrl(url: string) {
   }
 }
 
+const SAMPLES_BASE_URL = 'https://pub-80efc7b31f944811985c0bdc785ee183.r2.dev';
+
 async function loadSample(filename: string) {
-  await loadFromUrl(`/samples/${filename}`);
+  await loadFromUrl(`${SAMPLES_BASE_URL}/${filename}`);
 }
 
 function handleFileSelect(event: Event) {
@@ -496,7 +498,6 @@ onUnmounted(() => {
         <span class="demo-label">Try a demo file:</span>
         <button class="btn btn-demo" @click="loadSample('AMLTutorial.cloupe')">AML Tutorial</button>
         <button class="btn btn-demo" @click="loadSample('ATACTutorial.cloupe')">ATAC Tutorial</button>
-        <button class="btn btn-demo" @click="loadSample('SpatialTutorial.cloupe')">Spatial Tutorial</button>
       </div>
 
       <div class="divider"><span>or</span></div>

@@ -3,7 +3,7 @@ import { ref, onUnmounted, watch, nextTick } from 'vue';
 import { CloupeReader } from 'cloupe.js';
 import type { Projection } from 'cloupe.js';
 
-const SAMPLE_URL = '/samples/AMLTutorial.cloupe';
+const SAMPLE_URL = 'https://pub-80efc7b31f944811985c0bdc785ee183.r2.dev/AMLTutorial.cloupe';
 
 const reader = ref<CloupeReader | null>(null);
 const projections = ref<string[]>([]);
