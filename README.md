@@ -222,10 +222,22 @@ Requires support for:
 
 ## File Format
 
-This library reads .cloupe files created by 10x Genomics Cell Ranger pipeline and Loupe Browser. The format is reverse-engineered based on:
+This library reads `.cloupe` files created by the 10x Genomics Cell Ranger /
+Space Ranger pipelines and by `loupeR` (R) / `loupepy` (Python). The format is
+reverse-engineered from public readers and writers:
 
-- [cellgeni/cloupe](https://github.com/cellgeni/cloupe) - Python parser
-- [10XGenomics/loupeR](https://github.com/10XGenomics/loupeR) - R package for creating .cloupe files
+- [cellgeni/cloupe](https://github.com/cellgeni/cloupe) — Python parser
+- [10XGenomics/loupeR](https://github.com/10XGenomics/loupeR) — R package that creates `.cloupe` files
+- [linearparadox/loupepy](https://github.com/linearparadox/loupepy) — Python package (same Go backend as `loupeR`)
+
+### Tested producer versions
+
+| Producer                                      | Version range tested | Notes                                                                                         |
+| --------------------------------------------- | -------------------- | --------------------------------------------------------------------------------------------- |
+| `loupeR`                                      | ≤ 1.1.5 (2026-02)    | Full support                                                                                  |
+| `loupepy`                                     | ≤ 1.1.1 (2025-08)    | Full support                                                                                  |
+| Loupe Browser (read-back of user annotations) | 8.x – 9.0 (2025-06)  | Full support                                                                                  |
+| Loupe Browser 9.1+ (Visium HD 11 mm)          | 9.1 (2026-04)        | **Partial** — spatial-image tile reads are reverse-engineered and may not handle 11 mm slides |
 
 ### Supported Features
 

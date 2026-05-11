@@ -151,6 +151,7 @@ export class ProjectionReader {
     return new Projection({
       name: projInfo.Name,
       key: projInfo.Key,
+      method: projInfo.Method,
       dimensions: numDimensions,
       coordinates,
     });

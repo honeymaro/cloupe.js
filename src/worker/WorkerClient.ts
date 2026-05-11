@@ -151,6 +151,7 @@ export class CloupeWorkerClient {
     const result = await this.send<{
       name: string;
       key: string;
+      method?: string;
       dimensions: number;
       coordinates: ArrayBuffer[];
     }>({ type: "getProjection", name });
@@ -158,6 +159,7 @@ export class CloupeWorkerClient {
     return new Projection({
       name: result.name,
       key: result.key,
+      method: result.method,
       dimensions: result.dimensions,
       coordinates: result.coordinates.map((buf) => new Float64Array(buf)),
     });

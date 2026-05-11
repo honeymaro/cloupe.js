@@ -133,6 +133,7 @@ function assertReader(): CloupeReader {
 interface SerializedProjection {
   name: string;
   key?: string;
+  method?: string;
   dimensions: number;
   coordinates: ArrayBuffer[];
 }
@@ -141,6 +142,7 @@ function serializeProjection(proj: Projection): SerializedProjection {
   return {
     name: proj.name,
     key: proj.key,
+    method: proj.method,
     dimensions: proj.dimensions,
     coordinates: proj.coordinates.map((arr) => arr.buffer.slice(0) as ArrayBuffer),
   };

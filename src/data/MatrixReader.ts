@@ -51,24 +51,22 @@ export class MatrixReader {
    * Gets the matrix shape [numFeatures, numBarcodes]
    */
   get shape(): [number, number] {
-    let numFeatures = this.matrixInfo.GeneCount ?? this.matrixInfo.Rows ?? 0;
-    let numBarcodes = this.matrixInfo.CellCount ?? this.matrixInfo.Columns ?? 0;
+    let numFeatures =
+      this.matrixInfo.FeatureCount ?? this.matrixInfo.GeneCount ?? this.matrixInfo.Rows ?? 0;
+    let numBarcodes =
+      this.matrixInfo.BarcodeCount ?? this.matrixInfo.CellCount ?? this.matrixInfo.Columns ?? 0;
 
-    // Fallback to data block sizes if counts are 0
     if (numBarcodes === 0 && this.pointersBlock) {
-      // For CSC: numColumns = pointers.length - 1
       numBarcodes = this.pointersBlock.ArraySize - 1;
     }
     if (numFeatures === 0) {
-      // Try to get feature count from various block metadata
       const featureBlock =
+        this.matrixInfo.FeatureIds ??
         this.matrixInfo.Genes ??
         this.matrixInfo.GeneNames ??
         this.matrixInfo.Features ??
         this.matrixInfo.FeatureNames;
-      if (featureBlock?.ArraySize) {
-        numFeatures = featureBlock.ArraySize;
-      }
+      if (featureBlock?.ArraySize) numFeatures = featureBlock.ArraySize;
     }
 
     return [numFeatures, numBarcodes];

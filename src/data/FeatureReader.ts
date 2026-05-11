@@ -2,7 +2,8 @@
  * FeatureReader - Reads feature (gene/protein) data from .cloupe files
  *
  * Features are stored as fixed-width UTF-8 strings with null padding.
- * Each feature has an ID (Genes), name (GeneNames), and optionally a type.
+ * Each feature has an ID (FeatureIds / legacy: Genes), a name
+ * (FeatureNames / legacy: GeneNames), and optionally a type (FeatureTypes).
  */
 
 import {
@@ -34,7 +35,9 @@ export class FeatureReader {
    * Gets the total number of features
    */
   get count(): number {
-    // Try explicit counts first
+    if (this.matrixInfo.FeatureCount && this.matrixInfo.FeatureCount > 0) {
+      return this.matrixInfo.FeatureCount;
+    }
     if (this.matrixInfo.GeneCount && this.matrixInfo.GeneCount > 0) {
       return this.matrixInfo.GeneCount;
     }
@@ -42,53 +45,45 @@ export class FeatureReader {
       return this.matrixInfo.Rows;
     }
 
-    // Try ArraySize from ID block
     const idBlock = this.featureIdBlock;
     if (idBlock?.ArraySize && idBlock.ArraySize > 0) {
       return idBlock.ArraySize;
     }
 
-    // Try ArraySize from Name block
     const nameBlock = this.featureNameBlock;
     if (nameBlock?.ArraySize && nameBlock.ArraySize > 0) {
       return nameBlock.ArraySize;
     }
 
-    // For CSR format: numFeatures = CSRPointers.ArraySize - 1 (rows are features)
     const csrPointers = this.matrixInfo.CSRPointers;
     if (csrPointers?.ArraySize && csrPointers.ArraySize > 1) {
       return csrPointers.ArraySize - 1;
     }
 
-    // Calculate from block size as last resort
     if (idBlock && idBlock.ArrayWidth && idBlock.ArrayWidth > 0) {
       const blockSize = idBlock.End - idBlock.Start;
-      if (blockSize > 0) {
-        return Math.floor(blockSize / idBlock.ArrayWidth);
-      }
+      if (blockSize > 0) return Math.floor(blockSize / idBlock.ArrayWidth);
     }
     if (nameBlock && nameBlock.ArrayWidth && nameBlock.ArrayWidth > 0) {
       const blockSize = nameBlock.End - nameBlock.Start;
-      if (blockSize > 0) {
-        return Math.floor(blockSize / nameBlock.ArrayWidth);
-      }
+      if (blockSize > 0) return Math.floor(blockSize / nameBlock.ArrayWidth);
     }
 
     return 0;
   }
 
   /**
-   * Gets the feature ID block information (Genes or Features)
+   * Gets the feature ID block information (FeatureIds, Genes, or Features)
    */
   private get featureIdBlock() {
-    return this.matrixInfo.Genes ?? this.matrixInfo.Features;
+    return this.matrixInfo.FeatureIds ?? this.matrixInfo.Genes ?? this.matrixInfo.Features;
   }
 
   /**
-   * Gets the feature name block information (GeneNames or FeatureNames)
+   * Gets the feature name block information (FeatureNames or GeneNames)
    */
   private get featureNameBlock() {
-    return this.matrixInfo.GeneNames ?? this.matrixInfo.FeatureNames;
+    return this.matrixInfo.FeatureNames ?? this.matrixInfo.GeneNames;
   }
 
   /**

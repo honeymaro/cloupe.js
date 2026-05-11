@@ -60,6 +60,14 @@ describe("CloupeReader Integration", () => {
       expect(Array.isArray(tracks)).toBe(true);
       console.log("Available cell tracks:", tracks);
     });
+
+    it("should not crash when checking nextHeaderOffset chain", async () => {
+      // Regression guard for Task 2: even if the AML fixture has no secondary
+      // header, open() must succeed and return a consistent CellTracks list.
+      const tracks = reader.cellTrackNames;
+      expect(Array.isArray(tracks)).toBe(true);
+      expect(tracks.length).toBeGreaterThanOrEqual(1);
+    });
   });
 
   describe("summary", () => {

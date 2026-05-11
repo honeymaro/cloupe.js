@@ -159,8 +159,8 @@ export function getIndexSummary(index: IndexBlock): {
     clusteringCount: index.Clusterings?.length ?? 0,
     hasMetrics: (index.Metrics?.length ?? 0) > 0,
     analysisCount: index.Analyses?.length ?? 0,
-    geneCount: matrix?.GeneCount ?? matrix?.Rows ?? 0,
-    cellCount: matrix?.CellCount ?? matrix?.Columns ?? 0,
+    geneCount: matrix?.FeatureCount ?? matrix?.GeneCount ?? matrix?.Rows ?? 0,
+    cellCount: matrix?.BarcodeCount ?? matrix?.CellCount ?? matrix?.Columns ?? 0,
   };
 }
 
@@ -218,4 +218,50 @@ export function findSpatialImageTiles(
   }
 
   return undefined;
+}
+
+/**
+ * Merges a secondary index block into the primary one.
+ *
+ * The .cloupe format is a linked list of headers: the primary header points to
+ * the canonical analysis index; later headers (linked via `nextHeaderOffset`)
+ * hold user-created artifacts written by Loupe Browser - most importantly
+ * additional `CellTracks`. This function concatenates appendable artifact
+ * arrays (`CellTracks`, `Analyses`, `Projections`, `Clusterings`, `DiffExps`,
+ * `SpatialImages`, `SpatialImageTiles`), de-duplicating by `Uuid` where present.
+ *
+ * Reference: cellgeni/cloupe/cloupe/__init__.py:169-176
+ */
+export function mergeIndexBlocks(
+  primary: IndexBlock,
+  secondary: IndexBlock | undefined
+): IndexBlock {
+  if (!secondary) return primary;
+
+  const merged: IndexBlock = { ...primary };
+
+  const concatByUuid = <T extends { Uuid?: string }>(
+    a: T[] | undefined,
+    b: T[] | undefined
+  ): T[] | undefined => {
+    if (!a && !b) return undefined;
+    const out: T[] = [...(a ?? [])];
+    const seen = new Set(out.map((x) => x.Uuid).filter((u): u is string => !!u));
+    for (const item of b ?? []) {
+      if (item.Uuid && seen.has(item.Uuid)) continue;
+      out.push(item);
+      if (item.Uuid) seen.add(item.Uuid);
+    }
+    return out;
+  };
+
+  merged.CellTracks = concatByUuid(primary.CellTracks, secondary.CellTracks);
+  merged.Analyses = concatByUuid(primary.Analyses, secondary.Analyses);
+  merged.Projections = concatByUuid(primary.Projections, secondary.Projections);
+  merged.Clusterings = concatByUuid(primary.Clusterings, secondary.Clusterings);
+  merged.DiffExps = concatByUuid(primary.DiffExps, secondary.DiffExps);
+  merged.SpatialImages = concatByUuid(primary.SpatialImages, secondary.SpatialImages);
+  merged.SpatialImageTiles = concatByUuid(primary.SpatialImageTiles, secondary.SpatialImageTiles);
+
+  return merged;
 }

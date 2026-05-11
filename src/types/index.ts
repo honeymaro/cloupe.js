@@ -83,8 +83,13 @@ export interface MatrixInfo {
   FormatVersion?: string;
   ParentUuid?: string;
   Reference?: string;
-  GeneCount: number;
-  CellCount: number;
+  GeneCount?: number;
+  CellCount?: number;
+  // Upstream-canonical field names (cellgeni/cloupe __init__.py:129,147).
+  // Prefer these over the legacy Gene*/Cell* aliases when present.
+  FeatureCount?: number;
+  BarcodeCount?: number;
+  FeatureIds?: MatrixBlock;
   Metadata?: BlockLocation | null;
   Barcodes?: MatrixBlock;
   BarcodeNames?: MatrixBlock;
@@ -120,9 +125,23 @@ export interface ProjectionInfo {
   Metadata?: BlockLocation | null;
   Dims: number[];
   Matrix: MatrixBlock;
-  /** Scale factor for spatial projections (microns per pixel) */
+  /**
+   * @experimental Reverse-engineered. Not present in cellgeni/cloupe or
+   * 10XGenomics/loupeR open source. Observed only in spatial .cloupe files
+   * (Visium / Visium HD). May be renamed or removed in future versions.
+   */
   MicronsPerPixel?: number;
-  /** Projection type: 1=t-SNE, 2=UMAP, 3=Spatial, 4=Fiducials */
+  /**
+   * Producer-supplied method label (e.g., "UMAP", "t-SNE", or custom).
+   * Source: 10XGenomics/loupeR `R/hdf5.R:189-199`. Prefer this over `Type`
+   * when present.
+   */
+  Method?: string;
+  /**
+   * @experimental Reverse-engineered integer enum (1=t-SNE, 2=UMAP, 3=Spatial,
+   * 4=Fiducials). Not present in upstream readers. Prefer `Method` (string)
+   * when available.
+   */
   Type?: number;
   [key: string]: unknown;
 }
@@ -223,17 +242,20 @@ export interface Feature {
 export class Projection {
   readonly name: string;
   readonly key?: string;
+  readonly method?: string;
   readonly dimensions: number;
   readonly coordinates: Float64Array[];
 
   constructor(data: {
     name: string;
     key?: string;
+    method?: string;
     dimensions: number;
     coordinates: Float64Array[];
   }) {
     this.name = data.name;
     this.key = data.key;
+    this.method = data.method;
     this.dimensions = data.dimensions;
     this.coordinates = data.coordinates;
   }
@@ -532,7 +554,12 @@ export interface SliceOptions {
 // ============================================================================
 
 /**
- * Spatial Image metadata from index block
+ * @experimental Reverse-engineered. Spatial image surfaces (`SpatialImages`,
+ * `SpatialImageTiles`, `Fiducials`, tile pyramids) are NOT documented in any
+ * open-source .cloupe reference. These types reflect our own observations of
+ * Visium / Visium HD files written by Loupe Browser 8.x/9.x and may change.
+ *
+ * Wrap downstream reads in try/catch when targeting unknown producers.
  */
 export interface SpatialImageInfo {
   Name: string;
@@ -551,7 +578,7 @@ export interface SpatialImageInfo {
 }
 
 /**
- * Spatial Image Tiles metadata from index block
+ * @experimental Reverse-engineered. See {@link SpatialImageInfo} for caveats.
  */
 export interface SpatialImageTilesInfo {
   Name: string;
@@ -662,11 +689,18 @@ export class SpatialImage {
 // ============================================================================
 
 /**
- * Compression types used in .cloupe files
+ * Compression types used in .cloupe files.
+ *
+ * - `NONE` and `GZIP` are confirmed by cellgeni/cloupe `__init__.py:301-303`
+ *   (sniffed via gzip magic bytes).
+ * - `BLOCK` is `@experimental`: we observed it in real fixtures, but no
+ *   open-source reader documents the value `2`. Treat as our codebase's
+ *   internal convention.
  */
 export enum CompressionType {
   NONE = 0,
   GZIP = 1,
+  /** @experimental — see enum-level note. */
   BLOCK = 2,
 }
 

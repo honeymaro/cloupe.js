@@ -28,9 +28,10 @@ import {
   type SliceOptions,
 } from "../types/index.js";
 import { BlockReader } from "./BlockReader.js";
-import { parseHeader } from "./HeaderParser.js";
+import { parseHeader, parseHeaderAt } from "./HeaderParser.js";
 import {
   parseIndex,
+  mergeIndexBlocks,
   getPrimaryMatrix,
   extractProjections,
   extractCellTracks,
@@ -77,22 +78,39 @@ export class CloupeReader {
    */
   static async open(source: File | Blob | string): Promise<CloupeReader> {
     let blockReader: BlockReader;
-
     if (typeof source === "string") {
-      // URL provided - use Range Requests
       blockReader = await BlockReader.fromUrl(source);
     } else {
-      // File or Blob provided
       blockReader = new BlockReader(source);
     }
 
-    // Parse header
     const header = await parseHeader(blockReader);
+    const primaryIndex = await parseIndex(blockReader, header.indexBlock);
 
-    // Parse index block
-    const indexBlock = await parseIndex(blockReader, header.indexBlock);
+    // Follow secondary-header chain (Loupe Browser writes user-created
+    // CellTracks/annotations into a second header). cellgeni follows this
+    // once; we mirror that behavior to avoid infinite chains in malformed files.
+    let mergedIndex = primaryIndex;
+    if (
+      typeof header.nextHeaderOffset === "number" &&
+      header.nextHeaderOffset > 0 &&
+      header.nextHeaderOffset < blockReader.size
+    ) {
+      try {
+        const secondaryHeader = await parseHeaderAt(blockReader, header.nextHeaderOffset);
+        const secondaryIndex = await parseIndex(blockReader, secondaryHeader.indexBlock);
+        mergedIndex = mergeIndexBlocks(primaryIndex, secondaryIndex);
+      } catch {
+        // Secondary header is optional/best-effort — never let it break a
+        // primary-only file from loading. NOTE: a corrupted secondary header
+        // will silently hide user-created CellTracks from the resulting reader.
+        // We accept this trade-off because the alternative (throwing) would
+        // make primary-only files unloadable; future versions could surface
+        // this via a non-fatal warning channel if needed.
+      }
+    }
 
-    return new CloupeReader(blockReader, header, indexBlock);
+    return new CloupeReader(blockReader, header, mergedIndex);
   }
 
   // ============================================================================
@@ -118,15 +136,10 @@ export class CloupeReader {
    * Uses comprehensive fallback logic from BarcodeReader
    */
   get barcodeCount(): number {
-    // Quick check for explicit counts first
     const matrix = getPrimaryMatrix(this.indexBlock);
-    if (matrix?.CellCount && matrix.CellCount > 0) {
-      return matrix.CellCount;
-    }
-    if (matrix?.Columns && matrix.Columns > 0) {
-      return matrix.Columns;
-    }
-    // Use reader's comprehensive fallback logic
+    if (matrix?.BarcodeCount && matrix.BarcodeCount > 0) return matrix.BarcodeCount;
+    if (matrix?.CellCount && matrix.CellCount > 0) return matrix.CellCount;
+    if (matrix?.Columns && matrix.Columns > 0) return matrix.Columns;
     try {
       return this.barcodes.count;
     } catch {
@@ -139,15 +152,10 @@ export class CloupeReader {
    * Uses comprehensive fallback logic from FeatureReader
    */
   get featureCount(): number {
-    // Quick check for explicit counts first
     const matrix = getPrimaryMatrix(this.indexBlock);
-    if (matrix?.GeneCount && matrix.GeneCount > 0) {
-      return matrix.GeneCount;
-    }
-    if (matrix?.Rows && matrix.Rows > 0) {
-      return matrix.Rows;
-    }
-    // Use reader's comprehensive fallback logic
+    if (matrix?.FeatureCount && matrix.FeatureCount > 0) return matrix.FeatureCount;
+    if (matrix?.GeneCount && matrix.GeneCount > 0) return matrix.GeneCount;
+    if (matrix?.Rows && matrix.Rows > 0) return matrix.Rows;
     try {
       return this.features.count;
     } catch {
