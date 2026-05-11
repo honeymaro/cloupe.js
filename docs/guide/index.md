@@ -42,6 +42,27 @@ const cellExpression = await reader.getCellExpression(0);
 - **Standard gzip** (CompressionType=1)
 - **Block-indexed compression** (CompressionType=2): Used for large data, enables random access
 
+## Supported producers
+
+This library reads `.cloupe` files written by:
+
+- [10XGenomics/loupeR](https://github.com/10XGenomics/loupeR) (R) and
+  [linearparadox/loupepy](https://github.com/linearparadox/loupepy) (Python)
+- 10x Genomics Cell Ranger / Space Ranger pipelines
+- Loupe Browser when saving user annotations
+
+### Tested producer versions
+
+| Producer                                  | Version range tested | Notes                                                                                         |
+| ----------------------------------------- | -------------------- | --------------------------------------------------------------------------------------------- |
+| `loupeR`                                  | ≤ 1.1.5 (2026-02)    | Full support                                                                                  |
+| `loupepy`                                 | ≤ 1.1.1 (2025-08)    | Full support                                                                                  |
+| Loupe Browser (user annotation read-back) | 8.x – 9.0 (2025-06)  | Full support                                                                                  |
+| Loupe Browser 9.1+ (Visium HD 11 mm)      | 9.1 (2026-04)        | **Partial** — spatial-image tile reads are reverse-engineered and may not handle 11 mm slides |
+
+The format is reverse-engineered from public readers / writers. See
+[cellgeni/cloupe](https://github.com/cellgeni/cloupe) for the Python reference.
+
 ## Next Steps
 
 - [Installation](/guide/installation) - Add cloupe.js to your project

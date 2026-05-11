@@ -38,6 +38,9 @@ Class containing projection coordinates.
 ```typescript
 class Projection {
   readonly name: string;
+  readonly key?: string;
+  /** Producer-supplied label, e.g. "UMAP", "t-SNE". Source: loupeR. */
+  readonly method?: string;
   readonly dimensions: number;
   readonly coordinates: Float64Array[];
 

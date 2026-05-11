@@ -92,6 +92,17 @@ get cellTrackNames(): string[]
 
 Returns available cell track names.
 
+::: tip Loupe Browser annotations
+This list includes user-created cell tracks saved in a `.cloupe` file's
+**secondary index block** (the block linked by `header.nextHeaderOffset`).
+Loupe Browser writes user annotations there; `CloupeReader.open()`
+automatically follows the chain once and merges the secondary index's
+`CellTracks`, `Projections`, `Clusterings`, `DiffExps`, `SpatialImages`,
+`SpatialImageTiles`, and `Analyses` arrays into the primary view
+(de-duplicated by `Uuid` when present). A corrupt secondary header is
+silently ignored so a primary-only file still loads.
+:::
+
 ### clusteringNames
 
 ```typescript

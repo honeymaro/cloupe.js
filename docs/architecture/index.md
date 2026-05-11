@@ -46,6 +46,21 @@ The first 4096 bytes contain a JSON-formatted header:
 }
 ```
 
+### Secondary header chain
+
+A `.cloupe` file may be a **linked list of headers**: the primary header points
+to the canonical analysis index, while subsequent headers (chained via
+`nextHeaderOffset`) hold user-created artifacts written by Loupe Browser —
+most importantly additional `CellTracks` from manual annotations.
+
+`CloupeReader.open()` follows this chain once (single-step, never recursive)
+and merges the secondary index block's `CellTracks`, `Projections`,
+`Clusterings`, `DiffExps`, `SpatialImages`, `SpatialImageTiles`, and
+`Analyses` arrays into the primary view, de-duplicating by `Uuid` when
+present. A corrupt secondary header is silently ignored.
+
+Reference: `cellgeni/cloupe/cloupe/__init__.py:169-176`.
+
 ### Index Block
 
 The index block is gzip-compressed JSON containing location information for all data blocks:

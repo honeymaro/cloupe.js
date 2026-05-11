@@ -147,6 +147,13 @@ interface ZoomLevelInfo {
 
 ### SpatialImageInfo
 
+> **@experimental** — Reverse-engineered. Spatial image surfaces
+> (`SpatialImages`, `SpatialImageTiles`, `Fiducials`, tile pyramids) are NOT
+> documented in any open-source `.cloupe` reference. These types reflect our
+> own observations of Visium / Visium HD files written by Loupe Browser
+> 8.x/9.x and may change. Wrap downstream reads in try/catch when targeting
+> unknown producers.
+
 Spatial image metadata from the index block.
 
 ```typescript
@@ -161,6 +168,8 @@ interface SpatialImageInfo {
 ```
 
 ### SpatialImageTilesInfo
+
+> **@experimental** — See [SpatialImageInfo](#spatialimageinfo) for caveats.
 
 Spatial image tiles metadata from the index block.
 
@@ -335,18 +344,36 @@ interface IndexBlock {
 
 ### MatrixInfo
 
-Matrix metadata.
+Matrix metadata. The interface exposes both **upstream-canonical** key names
+(used by current Cell Ranger / Space Ranger / loupeR / loupepy producers, as
+referenced in `cellgeni/cloupe/cloupe/__init__.py:129,147`) and **legacy
+aliases** that older `.cloupe` files may carry. Readers prefer canonical keys
+when present and fall back to legacy aliases.
 
 ```typescript
 interface MatrixInfo {
   Name: string;
   Uuid?: string;
-  GeneCount: number;
-  CellCount: number;
+
+  // Upstream-canonical counts (preferred)
+  FeatureCount?: number;
+  BarcodeCount?: number;
+
+  // Legacy count aliases (older files)
+  GeneCount?: number;
+  CellCount?: number;
+
+  // Upstream-canonical data blocks (preferred)
+  FeatureIds?: MatrixBlock;
+  FeatureNames?: MatrixBlock;
   Barcodes?: MatrixBlock;
-  BarcodeNames?: MatrixBlock;
+
+  // Legacy block aliases
   Genes?: MatrixBlock;
   GeneNames?: MatrixBlock;
+  BarcodeNames?: MatrixBlock;
+
+  // Expression matrix (CSC native; CSR optional/legacy)
   CSCValues?: MatrixBlock;
   CSCPointers?: MatrixBlock;
   CSCIndices?: MatrixBlock;
@@ -365,6 +392,26 @@ interface ProjectionInfo {
   Key?: string;
   Dims: number[]; // [dimensions, points]
   Matrix: MatrixBlock;
+
+  /**
+   * Producer-supplied method label, e.g. "UMAP", "t-SNE", or custom.
+   * Source: 10XGenomics/loupeR `R/hdf5.R:189-199`. Prefer this over `Type`.
+   */
+  Method?: string;
+
+  /**
+   * @experimental Reverse-engineered. Not present in cellgeni/cloupe or
+   * 10XGenomics/loupeR open source. Observed only in spatial files
+   * (Visium / Visium HD).
+   */
+  MicronsPerPixel?: number;
+
+  /**
+   * @experimental Reverse-engineered integer enum (1=t-SNE, 2=UMAP,
+   * 3=Spatial, 4=Fiducials). Not present in upstream readers.
+   * Prefer `Method` (string) when available.
+   */
+  Type?: number;
 }
 ```
 
@@ -440,10 +487,15 @@ try {
 
 ## Compression Types
 
+`NONE` and `GZIP` are confirmed by `cellgeni/cloupe`
+`__init__.py:301-303` (sniffed via gzip magic bytes). `BLOCK = 2` is
+`@experimental`: observed in real fixtures, but no open-source reader
+documents the value `2`. Treat it as a codebase-internal convention.
+
 ```typescript
 enum CompressionType {
-  NONE = 0, // No compression
-  GZIP = 1, // Standard gzip
-  BLOCK = 2, // Block-indexed compression
+  NONE = 0, // No compression (verified)
+  GZIP = 1, // Standard gzip (verified)
+  BLOCK = 2, // @experimental — block-indexed compression
 }
 ```

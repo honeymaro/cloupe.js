@@ -86,7 +86,24 @@ Clears cached data.
 
 ## Projection Class
 
-Methods of the Projection class returned by `read()`:
+Returned by `read()` / `readDefault()`.
+
+### Properties
+
+```typescript
+readonly name: string; // e.g. "UMAP" or producer-supplied display name
+readonly key?: string; // Internal projection identifier when present
+readonly method?: string; // Producer-supplied algorithm label
+readonly dimensions: number; // Number of axes (typically 2)
+readonly coordinates: Float64Array[]; // One Float64Array per dimension
+```
+
+`method` is the upstream string label written by `loupeR` (see
+`R/hdf5.R:189-199`). It is the preferred way to identify the projection's
+algorithm; `ProjectionInfo.Type` (integer enum) is `@experimental` and may
+be absent.
+
+### Methods
 
 ### getCoordinates()
 
