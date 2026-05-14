@@ -39,6 +39,19 @@ export default defineConfig({
           },
         },
       },
+      // Node.js environment — URL-fixture suites only (opt-in via env)
+      {
+        test: {
+          name: "node-network",
+          environment: "node",
+          include: ["tests/integration.test.ts"],
+          testTimeout: 30_000,
+          hookTimeout: 30_000,
+          env: {
+            CLOUPE_NETWORK_TESTS: "1",
+          },
+        },
+      },
     ],
   },
 });

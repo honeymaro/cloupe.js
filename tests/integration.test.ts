@@ -5,7 +5,7 @@
  * 10x Genomics Loupe Browser files.
  */
 
-import { describe, it, expect, beforeAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 import { CloupeReader } from "../src/core/CloupeReader.js";
@@ -19,6 +19,14 @@ function fileToBlob(filePath: string): Blob {
 
 const FIXTURES_DIR = resolve(__dirname, "fixtures");
 const AML_FILE = resolve(FIXTURES_DIR, "AMLTutorial.cloupe");
+
+const NETWORK_TESTS = process.env.CLOUPE_NETWORK_TESTS === "1";
+const networkDescribe = NETWORK_TESTS ? describe : describe.skip;
+if (!NETWORK_TESTS) {
+  console.info(
+    "[integration] URL-fixture suites skipped (set CLOUPE_NETWORK_TESTS=1 to enable). Run `pnpm test:network` to include them."
+  );
+}
 
 describe("CloupeReader Integration", () => {
   let reader: CloupeReader;
@@ -656,5 +664,113 @@ describe("Multiple file formats", () => {
     }
 
     reader.close();
+  });
+});
+
+// ============================================================================
+// URL-driven fixture suites
+//
+// These exercise the same public CloupeReader API as the File/Blob suites
+// above, but read a .cloupe directly from cf.10xgenomics.com via HTTP Range
+// Requests. They validate the canonical-key resolution path against a
+// current-spec producer file (loupeR/Loupe Browser 9.x era). Range requests
+// only fetch metadata + targeted data blocks, so even a multi-GB upstream
+// file results in only a few MB of network traffic per suite.
+//
+// Suites are gated by CLOUPE_NETWORK_TESTS=1 (see top of file) and are run
+// by `pnpm test:network`.
+// ============================================================================
+
+const NSCLC_URL =
+  "https://cf.10xgenomics.com/samples/cell-exp/7.1.0/157k_21_NSCLC_multiplex/157k_21_NSCLC_multiplex_count_cloupe.cloupe";
+
+networkDescribe("URL fixture — NSCLC 157k multiplex (Loupe Browser 9.1)", () => {
+  let reader: CloupeReader;
+
+  beforeAll(async () => {
+    reader = await CloupeReader.open(NSCLC_URL);
+  });
+
+  afterAll(() => {
+    reader?.close();
+  });
+
+  it("opens via URL", () => {
+    expect(reader).toBeInstanceOf(CloupeReader);
+    expect(reader.version).toBeDefined();
+  });
+
+  it("resolves feature and barcode counts via canonical keys", () => {
+    expect(reader.featureCount).toBeGreaterThan(10_000); // human transcriptome ~18k
+    expect(reader.barcodeCount).toBeGreaterThan(100_000); // 157k multiplex
+  });
+
+  it("lists at least one projection", () => {
+    const names = reader.projectionNames;
+    expect(Array.isArray(names)).toBe(true);
+    expect(names.length).toBeGreaterThan(0);
+  });
+
+  it("lists at least one cell track", () => {
+    const names = reader.cellTrackNames;
+    expect(Array.isArray(names)).toBe(true);
+    expect(names.length).toBeGreaterThan(0);
+  });
+
+  it("reads at least one feature by name", async () => {
+    // ACTB is in the Human Transcriptome panel used by this multiplex fixture.
+    const result = await reader.features.findByName("ACTB");
+    expect(result).not.toBeNull();
+    expect(result!.feature.name.toUpperCase()).toBe("ACTB");
+  });
+
+  it("upstream uses canonical FeatureCount/BarcodeCount keys", () => {
+    const matrix = reader.rawIndex.Matrices?.[0];
+    expect(matrix?.FeatureCount).toBeGreaterThan(0);
+    expect(matrix?.BarcodeCount).toBeGreaterThan(0);
+  });
+});
+
+const VISIUM_HD_11MM_URL =
+  "https://cf.10xgenomics.com/samples/spatial-exp/4.1.0/Visium_HD_11mm_Mouse_Embryo/Visium_HD_11mm_Mouse_Embryo_cloupe_008um.cloupe";
+
+networkDescribe("URL fixture — Visium HD 11mm Mouse Embryo (Space Ranger 4.1.0)", () => {
+  let reader: CloupeReader;
+
+  beforeAll(async () => {
+    reader = await CloupeReader.open(VISIUM_HD_11MM_URL);
+  });
+
+  afterAll(() => {
+    reader?.close();
+  });
+
+  it("opens via URL", () => {
+    expect(reader).toBeInstanceOf(CloupeReader);
+    expect(reader.version).toBeDefined();
+  });
+
+  it("resolves canonical-key counts", () => {
+    expect(reader.featureCount).toBeGreaterThan(0);
+    // Mouse Embryo 11mm probe showed 875,109 barcodes. Threshold relaxed
+    // accordingly (plan originally had >1_000_000 which would have failed).
+    expect(reader.barcodeCount).toBeGreaterThan(500_000);
+  });
+
+  it("exposes Visium HD spatial-image surface", () => {
+    expect(reader.hasSpatialImages).toBe(true);
+    expect(reader.spatialImageNames.length).toBeGreaterThan(0);
+  });
+
+  it("exposes Visium HD specific projection types (Spatial + Fiducials)", () => {
+    const names = reader.projectionNames;
+    expect(names).toContain("Spatial");
+    expect(names).toContain("Fiducials");
+  });
+
+  it("upstream uses canonical FeatureCount/BarcodeCount keys", () => {
+    const matrix = reader.rawIndex.Matrices?.[0];
+    expect(matrix?.FeatureCount).toBeGreaterThan(0);
+    expect(matrix?.BarcodeCount).toBeGreaterThan(0);
   });
 });
